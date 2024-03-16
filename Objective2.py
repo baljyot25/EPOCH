@@ -7,23 +7,16 @@ from sklearn.datasets import fetch_california_housing
 def distance_to_line(point, line):
     a, b = line
     projection = np.dot(np.eye(len(point)) - np.outer(a, a), point - b)
-    return np.linalg.norm(projection)**2  # Squared distance
+    return np.linalg.norm(projection)**2  
 
 def cost_function(houses, line):
     return sum(distance_to_line(house, line) for house in houses)
 
-# Example usage
-# houses = np.array([[1, 2], [3, 4], [6 ,3]])  # Example coordinates of houses
-# efficient_line, mc = optimize_line(cord)
-# print("Minimum cost:", mc)
-# print("Efficient Line:", efficient_line)
-
 california = fetch_california_housing()
 
 x = california.data[:, 6]
-# x=x[:10000]
 y = california.data[:, 7]   
-# y=y[:10000]
+
 
 
 houses=np.asarray([x,y])
@@ -45,15 +38,12 @@ def gradient_on_a_point(x_i,y_i, line):
     return grad_a, grad_b
 
 def optimize_line_b(max_iterations=5, learning_rate=0.00001,learning_rate_c=0.07, tolerance=1e-5):
-    # Initialize line parameters
-    a = np.asanyarray([[1],[0]])*(1/np.sqrt(1))  # Random initial direction vector
-    # m /= np.linalg.norm(m)  # Normalize
-    b = np.asarray([[0], [0]])  # Mean position of houses
+    a = np.asanyarray([[1],[0]])*(1/np.sqrt(1))  
+    b = np.asarray([[0], [0]])  
     line = (a, b)
 
     cost = cost_function_b(x,y,line)
 
-    # k =len(x)/6000
     k=1
     for i in range(max_iterations):
         arr=find_maxs(line,x,y,k)
@@ -64,40 +54,15 @@ def optimize_line_b(max_iterations=5, learning_rate=0.00001,learning_rate_c=0.07
 
         new_line = (new_a, new_b)
         new_cost = cost_function_b(x,y,new_line)
-        # if abs(new_cost - cost) < tolerance:
-        #     break
         a, b = new_a, new_b
         line = new_line
         cost = new_cost
-        # mc = min(mc , cost)
-    # print("cost is - ",mc)
-    # print("cost is - ",cost)
+       
     return line
 
 
-for i in range(50, 51, 10):
-    a, b = optimize_line_b(i)
-    print(a, b, sep="\n")
-    print("cost for ",i,"iterations " ,cost_function_b(x, y, (a, b)))
 
+a, b = optimize_line_b(50)
+print(a, b, sep="\n")
+print("cost for ",50,"iterations " ,cost_function_b(x, y, (a, b)))
 
-m = -0.13579492 # slope
-c =-113.50287248
-
-a = np.asanyarray([[1],[-0.933]])*(1/np.sqrt(1+(0.933)**2))  # Random initial direction vector
-    # m /= np.linalg.norm(m)  # Normalize
-b = np.asarray([[0], [-86.3204]])  # Mean position of houses
-line = (a, b)
-
-
-print("cost for ",1,"iterations " ,cost_function_b(x, y, (a, b)))
-
-plt.figure(figsize=(8, 6))
-plt.scatter(x, y, alpha=0.5, color='blue', label='Data Points')
-plt.plot(x, m*x + c, color='red', label='Line: y = {}x + {}'.format(m, c))
-plt.title('Relationship between Feature at Index 6 and Feature at Index 7')
-plt.xlabel('Feature at Index 6')
-plt.ylabel('Feature at Index 7')
-plt.legend()
-plt.grid(True)
-plt.show()
